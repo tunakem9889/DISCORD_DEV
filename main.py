@@ -10,6 +10,8 @@ import subprocess
 import json
 from collections import deque
 import re
+from flask import Flask
+import threading
 
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
@@ -23,6 +25,19 @@ intents.voice_states = True
 
 bot = commands.Bot(command_prefix='$', intents=intents)
 client = genai.Client(api_key=genai_api_key)
+
+# Web server setup
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "Bot is running!", 200
+
+def run_web():
+    app.run(host="0.0.0.0", port=10000)
+
+# Start web server in another thread
+threading.Thread(target=run_web).start()
 
 # Audio system variables
 voice_clients = {}
