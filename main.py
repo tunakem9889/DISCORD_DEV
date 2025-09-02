@@ -11,8 +11,8 @@ import json
 from collections import deque
 import re
 from flask import Flask
+from pathlib import Path
 import threading
-import yt_dlp
 
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
@@ -38,15 +38,62 @@ def run_web():
     app.run(host="0.0.0.0", port=10000)
 
 # Start web server in another thread
-threading.Thread(target=run_web).start()
+thread = threading.Thread(target=run_web)
+thread.daemon = True
+thread.start()
 
-cookie_path = "./cookies.txt"  # nếu dùng Secret File
-# Hoặc "./cookies.txt" nếu bạn để trong repo
+# --------- yt-dlp cookies + options (Render-safe) ---------
+USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+)
 
-ydl_opts = {
-    "cookiefile": cookie_path,
-    "format": "bestaudio/best"
-}
+def resolve_cookie_path() -> str | None:
+    """Find a usable cookies.txt on Render/locally.
+
+    Priority order:
+    1) ENV: YTDLP_COOKIES_PATH or COOKIES_PATH
+    2) ./cookies.txt (repo)
+    3) /etc/secrets/cookies.txt (Render Secret File mount)
+    4) /opt/render/project/src/cookies.txt (Render project root)
+    Returns None if nothing exists.
+    """
+    candidates = [
+        os.getenv("YTDLP_COOKIES_PATH"),
+        os.getenv("COOKIES_PATH"),
+        "./cookies.txt",
+        "/etc/secrets/cookies.txt",
+        "/opt/render/project/src/cookies.txt",
+    ]
+
+    for path in candidates:
+        if not path:
+            continue
+        p = Path(path)
+        if p.is_file():
+            return str(p.resolve())
+    return None
+
+RESOLVED_COOKIE_PATH = resolve_cookie_path()
+if RESOLVED_COOKIE_PATH:
+    print(f"yt-dlp: using cookies at: {RESOLVED_COOKIE_PATH}")
+else:
+    print("yt-dlp: no cookies.txt found. YouTube may request verification on Render.")
+
+def build_ytdlp_opts(quiet: bool = True) -> dict:
+    """Centralized yt-dlp options with optional cookies and good headers."""
+    opts = {
+        "format": "bestaudio/best",
+        "noplaylist": True,
+        "quiet": quiet,
+        "no_warnings": quiet,
+        "http_headers": {"User-Agent": USER_AGENT},
+        # Using android client can reduce verification prompts sometimes
+        "extractor_args": {"youtube": {"player_client": ["android"]}},
+    }
+    if RESOLVED_COOKIE_PATH:
+        opts["cookiefile"] = RESOLVED_COOKIE_PATH
+    return opts
 
 # Audio system variables
 voice_clients = {}
@@ -55,7 +102,8 @@ current_songs = {}
 
 # FFMPEG options cho audio-only
 FFMPEG_OPTIONS = {
-    'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
+    'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 '
+                      f'-headers "User-Agent: {USER_AGENT}"',
     'options': '-vn'  # Chỉ phát audio, không có video
 }
 
@@ -97,17 +145,7 @@ class MusicPlayer:
 
 async def get_youtube_info(url):
     """Lấy thông tin bài hát từ YouTube (chỉ audio)"""
-    ydl_opts = {
-        'format': 'bestaudio/best',
-        'noplaylist': True,
-        'quiet': True,
-        'no_warnings': True,
-        'extractaudio': True,
-        'audioformat': 'mp3',
-        'outtmpl': '%(title)s.%(ext)s',
-        'cookiefile': cookie_path,
-        'http_headers': {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'},
-    }
+    ydl_opts = build_ytdlp_opts(quiet=True)
     
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
