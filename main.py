@@ -12,6 +12,7 @@ from collections import deque
 import re
 from flask import Flask
 import threading
+import yt_dlp
 
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
@@ -38,6 +39,19 @@ def run_web():
 
 # Start web server in another thread
 threading.Thread(target=run_web).start()
+
+cookie_path = "/opt/render/project/.render/cookies.txt"  # nếu dùng Secret File
+# Hoặc "./cookies.txt" nếu bạn để trong repo
+
+ydl_opts = {
+    "cookiefile": cookie_path,
+    "format": "bestaudio/best"
+}
+
+url = "https://www.youtube.com/watch?v=xxxxxxx"
+
+with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+    ydl.download([url])
 
 # Audio system variables
 voice_clients = {}
