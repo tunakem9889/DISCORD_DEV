@@ -1,13 +1,14 @@
-# Discord Bot với AI và Music Player
+# Discord Bot với AI và Audio Player
 
-Một Discord bot đa chức năng với khả năng AI chat và phát nhạc từ YouTube.
+Một Discord bot đa chức năng với khả năng AI chat và phát âm thanh từ nhiều nguồn khác nhau.
 
 ## ✨ Tính năng chính
 
 - **AI Chat**: Tích hợp Google Gemini AI để trả lời câu hỏi
-- **Music Player**: Phát nhạc từ YouTube với queue system
-- **Voice Commands**: Điều khiển nhạc qua voice channel
+- **Universal Audio Player**: Phát âm thanh từ YouTube, SoundCloud, Spotify, direct audio links và file upload
+- **Voice Commands**: Điều khiển âm thanh qua voice channel
 - **Auto-moderation**: Tự động xóa tin nhắn không phù hợp
+- **File Upload Support**: Hỗ trợ phát âm thanh từ file được upload (.mp3, .wav, .flac, .m4a, .ogg)
 
 ## 🚀 Cài đặt
 
@@ -37,7 +38,7 @@ GENAI_API_KEY=your_google_ai_api_key
 
 ### 5. Chạy bot
 ```bash
-python main.py
+python main_enhanced.py
 ```
 
 ## 📋 Danh sách lệnh
@@ -56,16 +57,17 @@ python main.py
 ### 🎵 Lệnh Audio/Voice
 | Lệnh | Mô tả | Ví dụ |
 |------|-------|-------|
-| `$play <URL>` | Phát nhạc từ YouTube | `$play https://youtube.com/watch?v=...` |
-| `$search <từ khóa>` | Tìm kiếm và phát nhạc | `$search despacito` |
+| `$play <URL>` | Phát âm thanh từ bất kỳ link nào | `$play https://youtube.com/watch?v=...` |
+| `$playfile` | Phát âm thanh từ file upload | Upload file + `$playfile` |
+| `$search <từ khóa>` | Tìm kiếm và phát âm thanh | `$search despacito` |
 | `$audio` | Bot tham gia kênh thoại | `$audio` |
-| `$skip` | Bỏ qua bài hát hiện tại | `$skip` |
-| `$pause` | Tạm dừng bài hát | `$pause` |
-| `$resume` | Tiếp tục phát bài hát | `$resume` |
-| `$stop` | Dừng phát nhạc và xóa queue | `$stop` |
+| `$skip` | Bỏ qua âm thanh hiện tại | `$skip` |
+| `$pause` | Tạm dừng âm thanh | `$pause` |
+| `$resume` | Tiếp tục phát âm thanh | `$resume` |
+| `$stop` | Dừng phát và xóa queue | `$stop` |
 | `$queue` | Hiển thị danh sách phát | `$queue` |
-| `$now` | Hiển thị bài hát đang phát | `$now` |
-| `$remove <số>` | Xóa bài hát khỏi queue | `$remove 2` |
+| `$now` | Hiển thị âm thanh đang phát | `$now` |
+| `$remove <số>` | Xóa âm thanh khỏi queue | `$remove 2` |
 | `$shuffle` | Xáo trộn queue | `$shuffle` |
 | `$volume [0-100]` | Điều chỉnh âm lượng | `$volume 80` |
 | `$leave` | Bot rời khỏi kênh voice | `$leave` |
@@ -74,7 +76,7 @@ python main.py
 
 ### 1. Khởi động bot
 ```
-python main.py
+python main_enhanced.py
 ```
 
 ### 2. Tham gia voice channel
@@ -82,35 +84,54 @@ python main.py
 $audio
 ```
 
-### 3. Phát nhạc
+### 3. Phát âm thanh từ URL
 ```
 $play https://youtube.com/watch?v=...
+$play https://soundcloud.com/...
+$play https://open.spotify.com/track/...
+$play https://example.com/audio.mp3
 ```
 
-### 4. Tìm kiếm nhạc
+### 4. Phát âm thanh từ file upload
+```
+[Upload file âm thanh (.mp3, .wav, .flac, .m4a, .ogg)]
+$playfile
+```
+
+### 5. Tìm kiếm âm thanh
 ```
 $search despacito
 ```
 
-### 5. Điều khiển phát nhạc
+### 6. Điều khiển phát âm thanh
 ```
-$skip      # Bỏ qua bài hát
+$skip      # Bỏ qua âm thanh
 $pause     # Tạm dừng
 $resume    # Tiếp tục
 $stop      # Dừng hoàn toàn
 ```
 
-### 6. Quản lý queue
+### 7. Quản lý queue
 ```
 $queue     # Xem danh sách
-$remove 2  # Xóa bài hát thứ 2
+$remove 2  # Xóa âm thanh thứ 2
 $shuffle   # Xáo trộn
 ```
 
-### 7. Hỏi AI
+### 8. Hỏi AI
 ```
 $start Bạn có thể làm gì?
 ```
+
+## 🌐 Hỗ trợ nguồn âm thanh
+
+Bot hỗ trợ phát âm thanh từ các nguồn sau:
+
+- **YouTube**: Video và playlist
+- **SoundCloud**: Track và playlist
+- **Spotify**: Track và album
+- **Direct Audio Links**: File âm thanh trực tiếp (.mp3, .wav, .flac, .m4a, .ogg)
+- **File Upload**: File âm thanh được upload lên Discord
 
 ## 🔧 Troubleshooting
 
@@ -118,10 +139,11 @@ $start Bạn có thể làm gì?
 - Kiểm tra bot có quyền "Connect" và "Speak" không
 - Đảm bảo bot online và hoạt động
 
-### Không phát được nhạc
+### Không phát được âm thanh
 - Kiểm tra FFmpeg đã được cài đặt chưa
-- Kiểm tra URL YouTube có hợp lệ không
+- Kiểm tra URL có hợp lệ không
 - Kiểm tra bot có quyền phát audio không
+- Đảm bảo file âm thanh không bị lỗi
 
 ### AI không trả lời
 - Kiểm tra API key Google AI có hợp lệ không
@@ -131,13 +153,22 @@ $start Bạn có thể làm gì?
 
 ```
 discord_dev/
-├── main.py              # File chính của bot
+├── main.py              # File chính của bot (phiên bản cũ)
+├── main_enhanced.py     # File chính với tính năng phát âm thanh nâng cao
 ├── requirements.txt     # Dependencies Python
 ├── .env                # File cấu hình (tạo từ env_example.txt)
 ├── FFMPEG_SETUP.md     # Hướng dẫn cài đặt FFmpeg
 ├── README.md           # File này
 └── discord.log         # Log file (tự động tạo)
 ```
+
+## 🆕 Tính năng mới
+
+### Phiên bản Enhanced (main_enhanced.py)
+- **Hỗ trợ đa nguồn**: YouTube, SoundCloud, Spotify, direct audio links
+- **File upload**: Phát âm thanh từ file được upload
+- **Thông tin chi tiết**: Hiển thị nguồn âm thanh và thông tin đầy đủ
+- **Xử lý lỗi tốt hơn**: Thông báo lỗi rõ ràng và hướng dẫn khắc phục
 
 ## 🤝 Đóng góp
 
