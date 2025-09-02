@@ -40,7 +40,7 @@ def run_web():
 # Start web server in another thread
 threading.Thread(target=run_web).start()
 
-cookie_path = "/etc/secrets/cookies.txt"  # nếu dùng Secret File
+cookie_path = "./cookies.txt"  # nếu dùng Secret File
 # Hoặc "./cookies.txt" nếu bạn để trong repo
 
 ydl_opts = {
