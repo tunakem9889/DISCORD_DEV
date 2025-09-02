@@ -105,6 +105,8 @@ async def get_youtube_info(url):
         'extractaudio': True,
         'audioformat': 'mp3',
         'outtmpl': '%(title)s.%(ext)s',
+        'cookiefile': cookie_path,
+        'http_headers': {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'},
     }
     
     try:
