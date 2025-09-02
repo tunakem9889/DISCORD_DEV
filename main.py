@@ -48,11 +48,6 @@ ydl_opts = {
     "format": "bestaudio/best"
 }
 
-url = "https://www.youtube.com/watch?v=xxxxxxx"
-
-with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-    ydl.download([url])
-
 # Audio system variables
 voice_clients = {}
 music_queues = {}
